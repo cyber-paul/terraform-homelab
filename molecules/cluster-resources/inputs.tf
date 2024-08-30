@@ -8,6 +8,32 @@ variable "base" {
   }
 }
 
+variable "namespaces" {
+  description = "Extra namespaces to be created - these will be created before all other resources in this molecule"
+  type = list(object({
+    name = string
+  }))
+  default = []
+}
+
+variable "per_environment_configuration" {
+  description = "Per environment configuration like what apps to install into the environment. All apps are present in production by default"
+  type = list(object({
+    name = string
+    applications = list(string)
+  }))
+}
+
+variable "databases" {
+    description = "Details about the db clusters to create using cnpg.io"
+    type = list(object({
+      type = string
+      repo = optional(string)
+      namespace = string
+      name = string
+    }))
+  }
+
 variable "cluster" {
   description = "Details about the cluster"
   type = object({
@@ -16,6 +42,15 @@ variable "cluster" {
     host = string
     hosts = list(string)
   })
+}
+
+variable "ingresses" {
+  description = "Details about extra ingresses to create to expose internal apps"
+  type = list(object({
+    name = string
+    namespace = optional(string)
+  }))
+  default = []
 }
 
 variable "externals" {
@@ -65,7 +100,7 @@ variable "externals" {
     },
     {
       name = "loki",
-      repo = "https://grafana.github.io/loki/charts",
+      repo = "https://grafana.github.io/helm-charts",
       version = "2.1.1",
       namespace = "homelab"
     },
@@ -76,33 +111,5 @@ variable "externals" {
       version = "v0.72.0",
       namespace = "homelab"
     },
-    # TODO: I don't think this is needed, need to check
-    # {
-    #   name = "grafana-agent-operator",
-    #   repo = "https://grafana.github.io/helm-charts",
-    #   version = "9.3.1",
-    #   namespace = "homelab"
-    # },
-    # TODO: nextcloud fails due to slow startup, need to figure this out
-    # {
-    #   name = "nextcloud"
-    #   repo = "https://nextcloud.github.io/helm"
-    #   version = "3.3.6"
-    #   namespace = "homelab"
-    # },
-    # TODO: Use coredns for DNS. Still not sure about this
-    # {
-    #   name = "coredns",
-    #   repo = "https://coredns.github.io/helm",
-    #   version = "1.19.7",
-    #   namespace = "homelab"
-    # },
-    # TODO: Add configuration for this
-    # {
-    #   name = "keycloak",
-    #   repo = "https://codecentric.github.io/helm-charts",
-    #   version = "20.0.3",
-    #   namespace = "homelab"
-    # },
   ]
 }
